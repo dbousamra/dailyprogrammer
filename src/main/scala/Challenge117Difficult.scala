@@ -14,8 +14,12 @@ object Challenge117Difficult extends JavaTokenParsers {
     }
 }
 object Challenge117Difficult2 extends JavaTokenParsers {
-  def expr: Parser[Any] = primitives ~ rep(operators)
-  def operators: Parser[Any] = "*"~expr | "/"~expr | "+"~expr | "-"~expr
+  // def expr: Parser[Any] = primitives ~ rep(operators)
+  // def operators: Parser[Any] = "*"~expr | "/"~expr | "+"~expr | "-"~expr
+  // def primitives = "x" | "y" | "z" | "("~expr~")"
+
+  def expr: Parser[Any] = primitives ~ operators
+  def operators: Parser[Any] = rep("*"~expr | "/"~expr | "+"~expr | "-"~expr)
   def primitives = "x" | "y" | "z" | "("~expr~")"
 
   def parse(input: String) = parseAll(expr, input) match {
@@ -58,18 +62,41 @@ S = ( S ) """
 
   def parseToRules(cfg: String) = cfg.replaceAll(" ", "").split("\n").map(Rule(_))
 
+  def convertPrimitivesToPC(primitives: Array[Rule]) = {
+    primitives.foldRight(failure("Non valid rule"): Parser[Any])(_.expression|_)
+  }
+
   def main(args: Array[String]): Unit = {
     val rules = parseToRules(input)
-    val (primitives, binaries) = rules.partition{ case x: Primitive => true; case _ => false }
-    println(primitives.mkString("\n"))
+    val (primitives, binaries) = rules.partition { case x: Primitive => true; case _ => false }
 
-    val primitives2 = primitives.foldRight(failure("Non valid rule"): Parser[Any])(_.expression|_)
+    val primitives2 = convertPrimitivesToPC(primitives)
 
-    println(parse("x", primitives2))
+    println(parse("(x)", primitives2))
   }
 
   def parse(input: String, expr: Parser[Any]) = parseAll(expr, input) match {
     case Success(result, _) => result
     case failure: NoSuccess => failure
   }
+}
+
+object Challenge117Difficult5 {
+
+  trait Rule { val product: String; val expression: String }
+  case class Primitive(product: String, expression: String) extends Rule
+  case class BinaryExpression(product: String, expression: String) extends Rule
+  
+  def main(args: Array[String]): Unit = {
+    val x = Primitive("A", "B")
+    val y = BinaryExpression("A", "B")
+    println(matcher(x))
+    println(matcher(y))
+  }
+
+  def matcher(rule: Rule) = rule match {
+    case p: Primitive => "P"
+    case be: BinaryExpression => "BE"
+  }
+  
 }
