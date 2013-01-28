@@ -2,7 +2,7 @@ import java.net.URL
 
 class Challenge112  {
 
-  def isValid(url: String) = try { new URL(url).toURI(); true } catch { case _ => false }
+  def isValid(url: String) = try { new URL(url).toURI(); true } catch { case _:Throwable => false }
 
   def parse(url: String) = {
     if (isValid(url)) {

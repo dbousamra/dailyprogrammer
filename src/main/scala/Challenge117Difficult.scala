@@ -35,16 +35,16 @@ object Challenge117Difficult2 extends JavaTokenParsers {
 }
 
 abstract case class Rule(product: String, expression: String)
-case class Primitive(override val product: String, override val expression: String) extends Rule(product, expression)
-case class BinaryExpression (override val product: String, override val expression: String) extends Rule(product, expression)
+class Primitive(override val product: String, override val expression: String) extends Rule(product, expression)
+class BinaryExpression (override val product: String, override val expression: String) extends Rule(product, expression)
 
 object Rule {
   def apply(line: String) = {
     val splitted = line.split("=")
     val (product, expression) = (splitted(0), splitted(1))
     product.r.findAllIn(expression).length match {
-      case 0 | 1 => Primitive(product, expression)
-      case _ => BinaryExpression(product, expression)
+      case 0 | 1 => new Primitive(product, expression)
+      case _ => new BinaryExpression(product, expression)
     }   
   }
 }

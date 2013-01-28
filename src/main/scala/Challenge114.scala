@@ -6,5 +6,6 @@ object Challenge114 {
 
   def main(args: Array[String]): Unit = {
     println(sampleWord)
+    println("Hello world")
   }
 }
